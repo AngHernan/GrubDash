@@ -98,27 +98,24 @@ function dishExists(req, res, next){
       message: `Dish id not found: ${dishId}`,
     })
   }
-  next();
+  res.locals.dish = foundDish;
+  return next();
 };
 
 function read(req, res, next) {
-  const {dishId} = req.params;
-  const foundDish = dishes.find((dish) => dish.id === dishId);
-  res.json({ data: foundDish})
+  res.json({ data: res.locals.dish})
 };
 
 function update(req, res){
-  const {dishId} = req.params;
-  const foundDish = dishes.find((dish) => dish.id === dishId);
-
+  dish = res.locals.dish;
   const { data: {name, description, image_url, price } = {} } = req.body;
   
-  foundDish.name = name;
-  foundDish.description = description;
-  foundDish.image_url = image_url;
-  foundDish.price = price;
+  dish.name = name;
+  dish.description = description;
+  dish.image_url = image_url;
+  dish.price = price;
   
-  res.json({data: foundDish})
+  res.json({data: dish})
 };
 
 module.exports = {

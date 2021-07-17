@@ -125,9 +125,6 @@ function quantityIsNumber(req, res, next){
   });
 }
 
-
-
-
 function dataIdMatch(req, res, next){
   const {orderId} = req.params;
   const {data: {id} = {}} = req.body;
@@ -140,7 +137,6 @@ function dataIdMatch(req, res, next){
     })
 }
 
-
 function list(req, res) {
   res.json({ data: orders });
 }
@@ -150,6 +146,7 @@ function orderExists(req, res, next){
   const foundOrder = orders.find((order) => order.id === orderId);
   
   if(foundOrder){
+    res.locals.order = foundOrder
     next();
     }
     return next({
@@ -159,29 +156,25 @@ function orderExists(req, res, next){
 };
 
 function read(req, res, next) {
-  const {orderId} = req.params;
-  const foundOrder = orders.find((order) => order.id === orderId);
-  res.json({ data: foundOrder})
+  res.json({ data: res.locals.order })
 };
 
 function update(req, res){
-  const {orderId} = req.params;
-  const foundOrder = orders.find((order) => order.id === orderId);
+  order = res.locals.order;
   const { data: { deliverTo, mobileNumber, status, dishes} = {} } = req.body;
   
-  foundOrder.deliverTo = deliverTo;
-  foundOrder.mobileNumber = mobileNumber;
-  foundOrder.status = status;
-  foundOrder.dishes = dishes;
+  order.deliverTo = deliverTo;
+  order.mobileNumber = mobileNumber;
+  order.status = status;
+  order.dishes = dishes;
   
-  res.json({data: foundOrder})
+  res.json({data: order})
 };
 
 function destroy(req, res, next){
-  const { orderId } = req.params;
-  const foundOrder = orders.find((order) => order.id === orderId);
+  foundOrder = res.locals.order;
   if (foundOrder.status === 'pending'){
-    const index = orders.findIndex((order) => order.id === orderId);
+    const index = orders.findIndex((order) => order.id === foundOrder.Id);
   orders.splice(index, 1);
   
   res.sendStatus(204);
